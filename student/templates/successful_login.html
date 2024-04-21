@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        h1 {
+            text-align: left;
+            color: green;
+            font-size: 22px;
+            font-family: "Arial";
+            margin-left: 20px;
+        }
+        .back-to-home a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: green;
+            color: #FFF;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .back-to-home a:hover {
+            background-color: #003d00;
+        }
+    </style>
+    <meta charset="UTF-8">
+    <title>Log In Successful</title>
+</head>
+<body>
+<h1>Hello, You Signed in Successfully!!!</h1>
+<div class="back-to-home">
+        <a href="{% url 'home' %}">Back to Home</a>
+    </div>
+</body>
+</html>

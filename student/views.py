@@ -1,11 +1,16 @@
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login
+
 from .forms import StudentRegistrationForm, LoginForm
 from .models import Student
 
 
 def home(request):
+    return render(request, 'home.html')
+
+
+def login_page(request):
     form = LoginForm()
     return render(request, 'login.html', {'form': form})
 
@@ -35,7 +40,7 @@ def login_(request):
             user = authenticate(email=email, password=password)
             if user is not None:
                 login(request, user)
-                return render(request, 'students_page.html')
+                return render(request, 'successful_login.html')
             else:
                 return render(request, 'login.html', {'form': form})
 
@@ -44,3 +49,11 @@ def login_(request):
     else:
         form = LoginForm(request.POST)
         return render(request, 'login.html', {'form': form})
+
+
+def students_page(request):
+    return render(request, 'successful_login.html')
+
+
+def registration_student(request):
+    return render(request, 'successful_registration.html')

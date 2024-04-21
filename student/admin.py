@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from student.models import Student, Faculty, Subject, Lecture
+from student.models import Student, Faculty, Subject, Lecturer
 
 
 # Register your models here.
@@ -22,6 +22,6 @@ class SubjectAdmin(admin.ModelAdmin):
     list_display = ('title',)  # Wrap the field name in a tuple
 
 
-@admin.register(Lecture)
-class LectureAdmin(admin.ModelAdmin):
+@admin.register(Lecturer)
+class LecturerAdmin(admin.ModelAdmin):
     list_display = ('name', 'surname')

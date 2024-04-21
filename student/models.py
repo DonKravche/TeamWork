@@ -4,47 +4,61 @@ from django.contrib.auth.models import AbstractBaseUser, AbstractUser
 
 
 # Create your models here.
-
-
 class Faculty(models.Model):
-    name = models.CharField(max_length=255, verbose_name="Faculty name")
+    name = models.CharField(verbose_name="Faculty name", max_length=255)
 
     def __str__(self):
         return self.name
 
-
-class Subject(models.Model):
-    id = models.AutoField(primary_key=True)
-    title = models.CharField(max_length=255, verbose_name="Subject Name")
-    description = models.TextField(verbose_name="Subject Description")
-    syllabus = models.FileField(upload_to='syllabi/', verbose_name="Syllabus")
-    faculties = models.ManyToManyField(Faculty, related_name='subjects')
-    lecturers = models.ManyToManyField('Lecture', related_name='subjects')
-
-    def __str__(self):
-        return self.title
+    class Meta:
+        verbose_name_plural = 'Faculties'
+        verbose_name = 'Faculty'
 
 
-class Lecture(models.Model):
-    name = models.CharField(max_length=255, verbose_name="Lecture Name")
-    surname = models.CharField(max_length=255, verbose_name="Lecture Surname")
+class Lecturer(models.Model):
+    name = models.CharField(verbose_name="Lecturer Name", max_length=255)
+    surname = models.CharField(verbose_name="Lecturer Surname", max_length=255)
 
     def __str__(self):
         return f"{self.name} {self.surname}"
 
+    class Meta:
+        verbose_name_plural = 'Lecturers'
+        verbose_name = 'Lecturer'
+
+
+class Subject(models.Model):
+    id = models.AutoField(primary_key=True)
+    title = models.CharField(verbose_name="Subject Name", max_length=255)
+    description = models.TextField(verbose_name="Subject Description")
+    syllabus = models.FileField(verbose_name="Syllabus", upload_to='syllabuses/')
+    faculties = models.ManyToManyField(Faculty, related_name='subjects')
+    lecturers = models.ManyToManyField(Lecturer, related_name='subjects')
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name_plural = 'Subjects'
+        verbose_name = 'Subject'
+
 
 class UserManager(BaseUserManager):
-    def _create_user(self, email, password, **extra_fields):
+    def _create_user(self, name, surname, email, password, **extra_fields):
+        name = name.lower()
+        surname = surname.lower()
         email = email.lower()
-        user = self.model(email=email, **extra_fields)
+        user = self.model(name=name, surname=surname, email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_user(self, email, password=None, **extra_fields):
+    def create_user(self, name, surname, email, password=None, **extra_fields):
+        name = name.lower()
+        surname = surname.lower()
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', False)
-        return self._create_user(email, password, **extra_fields)
+        return self._create_user(name, surname, email, password, **extra_fields)
 
     def create_superuser(self, email, password, **extra_fields):
         extra_fields.setdefault('is_staff', True)
@@ -59,12 +73,24 @@ class UserManager(BaseUserManager):
 
 
 class Student(AbstractUser):
-    name = models.CharField(max_length=255, verbose_name="Student Name")
-    surname = models.CharField(max_length=255, verbose_name="Student Surname")
-    faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE, related_name='students', null=True, blank=True)
-    subjects = models.ManyToManyField(Subject, verbose_name='subjects')
-    email = models.EmailField(max_length=255, verbose_name="Student Email", unique=True)
-    password = models.CharField(max_length=255, verbose_name="Student Password")
+    name = models.CharField(verbose_name="Student Name", max_length=255)
+    surname = models.CharField(verbose_name="Student Surname", max_length=255)
+    email = models.EmailField(verbose_name="Student Email", max_length=255, unique=True)
+    password = models.CharField(verbose_name="Student Password", max_length=255)
+    faculty = models.ForeignKey(
+        Faculty,
+        verbose_name="Faculty",
+        on_delete=models.CASCADE,
+        related_name='students',
+        null=True,
+        blank=True
+    )
+    subjects = models.ManyToManyField(
+        Subject,
+        verbose_name='Subjects',
+        related_name='students',
+        blank=True
+    )
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['password']
     objects = UserManager()
@@ -80,3 +106,7 @@ class Student(AbstractUser):
         anonymous users.
         """
         return False
+
+    class Meta:
+        verbose_name_plural = 'Students'
+        verbose_name = 'Student'
